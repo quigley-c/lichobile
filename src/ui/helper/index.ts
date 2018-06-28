@@ -249,12 +249,13 @@ export function classSet(classes: {[cl: string]: boolean}): string {
   return arr.join(' ')
 }
 
-export function isWideScreen(): boolean {
-  return viewportDim().vw >= 600
+export function isTabletLandscape(): boolean {
+  return !isPortrait() && viewportDim().vh >= 600
 }
 
-export function isVeryWideScreen(): boolean {
-  return viewportDim().vw >= 960
+// TODO refactor
+export function isWideScreen(): boolean {
+  return viewportDim().vw >= 600
 }
 
 export function is43Aspect(): boolean {

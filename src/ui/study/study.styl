@@ -235,6 +235,16 @@
   justify-content center
   align-items center
 
+.study-commentsInReplay
+  @media only screen and (orientation landscape) and (min-height 600px)
+    flex 0 0 200px
+  @media only screen and (orientation landscape) and (min-height 768px)
+    flex 0 0 300px
+  display flex
+  flex-flow column nowrap
+  > .analyse-header
+    padding 0 0.5em
+
 .study-replayActions
   flex 0 0 40px
   display flex
@@ -260,9 +270,13 @@
       border 0
       border-radius 3px
 
-.study-replayWrapper
+.study-innerReplayWrapper
   display: flex
   flex-flow row nowrap
+
+.study-replayWrapper
+  display: flex
+  flex-flow column nowrap
 
 
 .view-container.light

@@ -174,7 +174,7 @@ function renderTabTitle(ctrl: AnalyseCtrl, curTab: Tab) {
 function renderReplay(ctrl: AnalyseCtrl) {
   // TODO enable when study has write support
   // if (ctrl.study && ctrl.study.canContribute()) {
-  //   return h('div.study-replayWrapper', [
+  //   return h('div.study-innerReplayWrapper', [
   //     h('div.analyse-replayWrapper', [
   //       h(Replay, { ctrl, rightTabActive: ctrl.study.vm.showComments }),
   //       ctrl.study.vm.showComments ? renderComments(ctrl.study) : null
@@ -184,8 +184,15 @@ function renderReplay(ctrl: AnalyseCtrl) {
   // } else {
   // }
 
-  return h('div.analyse-replayWrapper', [
-    h(Replay, { ctrl, rightTabActive: false }),
+  return h('div.study-replayWrapper', [
+    h('div.analyse-replayWrapper', [
+      h(Replay, { ctrl, rightTabActive: false }),
+    ]),
+    helper.isTabletLandscape() ?
+      h('div.study-commentsInReplay', [
+        h('h2.analyse-header', 'Comments'),
+        renderReadonlyComments(ctrl)
+      ]) : null,
   ])
 }
 
