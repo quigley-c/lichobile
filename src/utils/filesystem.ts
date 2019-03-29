@@ -39,20 +39,41 @@ function syncRemoteFile(fs: FileSystem, remoteFileUri: string, fileName: string,
     fs.root.getFile(
       prefix + fileName,
       { create: true, exclusive: false },
-      (fileEntry) =>
-        download(fileEntry, remoteFileUri, onProgress)
-        .then(resolve)
-        .catch(err => {
-          // a zero lenght file is created while trying to download and save
-          fileEntry.remove(() => {})
-          reject(err)
-        }),
+      (fileEntry) => {
+        const writeAndRetry = (blob: Blob, nbRetries: number = 0) => {
+          write(fileEntry, blob)
+          .then(resolve)
+          .catch(err => {
+            console.error(err)
+            if (nbRetries <= 5) {
+              setTimeout(writeAndRetry(blob, nbRetries + 1))
+            } else {
+              reject(err)
+            }
+          })
+        }
+        download(remoteFileUri, onProgress)
+        .then(blob => {
+          writeAndRetry(blob)
+        })
+        .catch(reject)
+      },
       reject
     )
   })
 }
 
-function download(fileEntry: FileEntry, remoteURI: string, onProgress?: (e: ProgressEvent) => void): Promise<FileEntry> {
+function write(fileEntry: FileEntry, data: Blob): Promise<FileEntry> {
+  return new Promise((resolve, reject) => {
+    fileEntry.createWriter(fileWriter => {
+      fileWriter.onwriteend = () => resolve(fileEntry)
+      fileWriter.onerror = reject
+      fileWriter.write(data)
+    }, reject)
+  })
+}
+
+function download(remoteURI: string, onProgress?: (e: ProgressEvent) => void): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const client = new XMLHttpRequest()
     client.open('GET', remoteURI, true)
@@ -61,13 +82,8 @@ function download(fileEntry: FileEntry, remoteURI: string, onProgress?: (e: Prog
         client.onprogress = onProgress
       }
       client.onload = () => {
-        const blob = client.response
-        if (blob) {
-          fileEntry.createWriter(fileWriter => {
-            fileWriter.onwriteend = () => resolve(fileEntry)
-            fileWriter.onerror = reject
-            fileWriter.write(blob)
-          }, reject)
+        if (client.response) {
+          resolve(client.response)
         } else {
           reject('could not get file')
         }
