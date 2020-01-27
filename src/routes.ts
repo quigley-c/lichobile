@@ -190,6 +190,18 @@ export default {
         })
       })
 
+      router.add('messenger', ({ params }) => {
+        import('./ui/msg/messenger').then(m => {
+          onRouteMatch(m.default, params)
+        })
+      })
+
+      router.add('messenger/:id', ({ params }) => {
+        import('./ui/msg/convo').then(m => {
+          onRouteMatch(m.default, params)
+        })
+      })
+
       router.add('inbox', ({ params }) => {
         import('./ui/inbox/inbox').then(m => {
           onRouteMatch(m.default, params)

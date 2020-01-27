@@ -388,10 +388,12 @@ function createStudy(
   return socketIfaceFactory(url)
 }
 
-function createDefault() {
+function createDefault(
+  handlers?: MessageHandlers
+) {
   if (hasNetwork()) {
     const socketHandlers = {
-      events: defaultHandlers,
+      events: { ...defaultHandlers, ...handlers },
       onOpen: session.backgroundRefresh
     }
     const opts = {
